@@ -1,0 +1,167 @@
+<html>
+<head>
+<style>
+#map {
+height: 400px;
+width: 100%;
+}
+</style>
+<script>setTimeout(function(){window.location.reload(1);},2400000);
+
+function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.send(null);
+}
+
+
+function myFunction(){
+console.log('start');
+
+}
+
+function encender(){
+    console.log("Encender");
+	httpGetAsync('http://192.168.61.203/cosas_nodos_sim(3).html?p=encender', function(){});
+}
+function apagar(){
+    console.log("Apagar");
+	httpGetAsync('http://192.168.61.203/cosas_nodos_sim(3).html?p=apagar', function(){});
+}
+</script>
+</head>
+<body onload="myFunction()"> 
+<h1>Control de luz por internet</h1>
+<h2><button onclick="encender()">Encender</button></h2>
+<h2><button onclick="apagar()">Apagar</button></h2>
+<div id="map"></div>
+<script>
+function initMap() {
+var uluru = {lat: 43.36, lng: -5.87};
+var uluru2 = {lat: 43.32, lng: -5.87};
+var uluru3 = {lat: 43.32, lng: -5.84};
+var uluru4 = {lat: 43.35, lng: -5.86};
+var tempTest = 20;
+var humTest = 30;
+var map = new google.maps.Map(document.getElementById('map'), {
+zoom: 12,
+center: uluru
+});
+var marker = new google.maps.Marker({
+position: uluru,
+map: map
+});
+
+
+
+  var contentString = '<h1> Lugar 1: Escuela de Ingeniería Informática</h1>' +
+      '<h2> Longitud: ' + uluru.lng + '</h2>' +
+      '<h2> Latitud: ' + uluru.lat + '</h2>' +
+      '<div id="content">'+
+      ' Temperatura :<span id="temperaturaMapa"></span> '+
+	  ' Humedad :  <span id="humedadMapa"></span>'+
+      '</div>';
+
+  var infowindow = new google.maps.InfoWindow({
+    content: contentString
+  });
+
+  var marker = new google.maps.Marker({
+    position: uluru4,
+    map: map,
+    title: 'Uluru (Ayers Rock)'
+  });
+  marker.addListener('click', function() {
+    infowindow.open(map, marker);
+	  httpGetAsync('http://192.168.61.203/cosas_nodos_sim(3).html?p=temperatura', function(temperatura){
+        if(temperatura < 20 || temperatura > 25)
+            document.getElementById("temperaturaMapa").style.color="red";
+        }
+        document.getElementById("temperaturaMapa").textContent=temperatura;
+        document.getElementById("temperaturaMapa").value=temperatura;
+    });
+																			
+	httpGetAsync('http://192.168.61.203/cosas_nodos_sim(3).html?p=humedad', function(humedad){
+        if(humedad < 20 || humedad > 25) {
+            document.getElementById("humedadMapa").style.color="red";
+        }
+        document.getElementById("humedadMapa").textContent=humedad
+        document.getElementById("humedadMapa").value=humedad;
+    });																		
+	
+  });
+
+  
+	var contentString2 = '<h1> Lugar 2: Ruta de la Plata</h1>' +
+      '<h2> Longitud: ' + uluru2.lng + '</h2>' +
+      '<h2> Latitud: ' + uluru2.lat + '</h2>' +
+      '<div id="content">'+
+      ' Temperatura : '+ (Math.floor(Math.random() * 10) + 20)+
+	  ' Humedad :  '+ (Math.floor(Math.random() * 15) + 25)+
+      '</div>';
+
+  var infowindow2 = new google.maps.InfoWindow({
+    content: contentString2
+  });
+	var marker2 = new google.maps.Marker({
+	position: uluru2,
+	map: map
+	});
+	marker2.addListener('click', function() {
+    infowindow2.open(map, marker2);
+  });
+  
+  var contentString3 = '<h1> Lugar 3: Venta del Aire</h1>' +
+      '<h2> Longitud: ' + uluru3.lng + '</h2>' +
+      '<h2> Latitud: ' + uluru3.lat + '</h2>' +
+      '<div id="content">'+
+      ' Temperatura : '+ (Math.floor(Math.random() * 10) + 20)+
+	  ' Humedad :  '+ (Math.floor(Math.random() * 15) + 25)+
+      '</div>';
+  var infowindow3 = new google.maps.InfoWindow({
+    content: contentString3
+  });
+	var marker3 = new google.maps.Marker({
+	position: uluru3,
+	map: map
+	});
+	marker3.addListener('click', function() {
+    infowindow3.open(map, marker3);
+  });
+  
+  
+  var contentString4 = '<h1> Lugar 4: Olivares</h1>' +
+      '<h2> Longitud: ' + uluru4.lng + '</h2>' +
+      '<h2> Latitud: ' + uluru4.lat + '</h2>' +
+      '<div id="content">'+
+      ' Temperatura : '+ (Math.floor(Math.random() * 10) + 20)+
+	  ' Humedad :  '+ (Math.floor(Math.random() * 15) + 25)+
+      '</div>';
+  var infowindow4 = new google.maps.InfoWindow({
+    content: contentString4
+  });
+	var marker4 = new google.maps.Marker({
+	position: uluru,
+	map: map
+	});
+	marker4.addListener('click', function() {
+    infowindow4.open(map, marker4);
+  });
+}
+
+</script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCV9EEN87zf9h9URTUwxPl3ZkpiN8etqNk&callback=initMap">
+</script>
+<b>Temperatura <p id="temperatura"></p> </b>
+<b>Humedad <p id="humedad"></p></b>
+</body>
+</html>
+HTTP/1.1 200 OK
+Content-Type: text/html
+

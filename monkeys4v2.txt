@@ -1,0 +1,102 @@
+;;; monkeys1. El original. 
+
+;;; Problema: Se mete en bucles infinitos ..
+
+
+
+(defrule start (initial-fact) => (assert (door start room1))
+                                 (assert (door room1 room2))
+                                 (assert (door room2 room3))
+                                 (assert (door room3 room4))
+								 (assert (door room1 room5))
+                                 (assert (location crate room4 middle))
+                                 (assert (location bananas room4 bottom top))
+                                 (assert (location monkey start))
+								 (assert (goal monkey full))
+)
+
+
+(defrule move (logical (goal monkey ?goal))
+	?lm <- (location monkey ?loc1)
+	(door ?loc1 ?loc2)
+	(not (was-location monkey ?loc2))
+=> 
+	(assert (location monkey ?loc2) )
+	(assert (was-location monkey ?loc1))
+	(retract ?lm)
+	(printout t "move from " ?loc1 " to " ?loc2 crlf)
+)
+
+(defrule back-start (location monkey start)
+					?goal <-(goal monkey start)
+=>
+	(retract ?goal)
+	(printout t "Monkey is full and happy in the start point" crlf)
+)
+
+(defrule putsDoors (declare (salience 10)) (door ?loc1 ?loc2)
+									(not (door ?loc2 ?loc1))
+=>
+	(assert (door ?loc2 ?loc1))
+	(printout t "Created way back from " ?loc2 " to " ?loc1 crlf)
+
+)
+
+(defrule moveCrate (location monkey room4) 
+                   ?lc <- (location crate room4 middle) 
+                   (location bananas room4 bottom top) 
+=> 
+   (assert (location crate room4 bottom))
+   (retract ?lc)
+   (printout t "move crate" crlf)
+)
+
+
+(defrule climbCrate ?lm <- (location monkey room4) 
+                    (location crate room4 bottom) 
+                    (location bananas room4 bottom top) 
+=> 
+   (assert (location monkey room4 onCrate))
+   (retract ?lm)
+   (printout t "climb" crlf)
+)
+
+(defrule climbDownCrate ?lm <- (location monkey room4 onCrate)
+							(monkey full)
+=>
+	(assert (location monkey room4))
+	(retract ?lm)
+	(printout t "Monkey is back to the center of the room" crlf)
+
+)
+
+(defrule getBananas (location monkey room4 onCrate) 
+                   ?lb <- (location bananas room4 bottom top) 
+=> 
+   (assert (location bananas withMonkey))
+   (retract ?lb)
+   (printout t "get" crlf)
+)
+
+(defrule eatBananas ?lb <- (location bananas withMonkey)
+					?goal <- (goal monkey full)
+=> 
+   (assert (monkey full))
+   (assert (goal monkey start))
+   (retract ?lb)
+   (retract ?goal)
+   (printout t "eat" crlf)
+)
+
+(defrule elimina-callejones (declare (salience -10)) ?plm <- (was-location monkey ?loc1)
+=>
+	(retract ?plm)
+	(printout t "Monket forgot that he was on " ?loc1 crlf)
+
+)
+
+
+
+
+
+                   
